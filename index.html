@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100 Ngày Python - Thống Kê Dự Án</title>
+    <style>
+        /* --- Biến CSS để dễ quản lý màu sắc và font --- */
+        :root {
+            --bg-dark: #000;
+            --text-light: #fff;
+            --text-gray: #ccc;
+            --card-bg: #1a1a1a; /* Nền thẻ hơi sáng hơn đen */
+            --border-color: #444; /* Viền xám đậm */
+            --highlight-bg: #fff;
+            --highlight-text: #000;
+            --progress-bg: #333;
+            --progress-fill: #fff;
+            --hover-bg: #2a2a2a; /* Nền khi hover hơi sáng hơn card-bg */
+            --divider-color: #666; /* Đường phân chia xám */
+            --font-mono: 'Courier New', monospace;
+            --accent-yellow: #FFD700; /* Màu vàng cho các mark/labels */
+        }
+
+        /* --- Reset CSS cơ bản --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 10px;
+            min-height: 100vh; /* Đảm bảo footer ở cuối trang */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px; /* Padding lớn hơn cho desktop */
+            flex-grow: 1; /* Đảm bảo container chiếm hết không gian còn lại */
+        }
+
+        /* --- Tiêu đề chính --- */
+        h1 {
+            text-align: center;
+            font-size: 2.8rem; /* Lớn hơn một chút */
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            word-wrap: break-word;
+            letter-spacing: 1px; /* Tăng khoảng cách chữ */
+            color: var(--text-light);
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.3rem; /* Lớn hơn một chút */
+            margin-bottom: 40px;
+            color: var(--text-gray);
+            font-style: italic; /* Thêm phong cách */
+        }
+
+        /* --- Container cho 4 thẻ đầu tiên (Flexbox Layout) --- */
+        .main-stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Căn giữa các thẻ khi chúng không lấp đầy một hàng */
+            gap: 25px; /* Khoảng cách giữa các thẻ */
+            margin-bottom: 50px;
+        }
+
+        /* --- Thẻ thống kê chung --- */
+        .stat-card {
+            border: 1px solid var(--border-color);
+            padding: 20px; /* Padding lớn hơn */
+            background-color: var(--card-bg);
+            min-height: 220px; /* Chiều cao tối thiểu */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+            position: relative; /* Để đặt các mark */
+            margin-bottom: 25px; /* Khoảng cách dưới cho các thẻ không nằm trong main-stats-container */
+            width: 100%; /* Mặc định toàn chiều rộng cho các thẻ không nằm trong main-stats-container */
+        }
+        /* Điều chỉnh chiều rộng cho 4 thẻ đầu tiên */
+        .main-stats-container .stat-card {
+            width: calc(50% - 12.5px); /* Khoảng hai cột với khoảng cách */
+            margin-bottom: 0; /* Không cần margin-bottom riêng vì đã có gap trên container */
+        }
+
+        .stat-card:hover {
+            background-color: var(--hover-bg);
+            border-color: var(--text-light); /* Viền sáng hơn khi hover */
+        }
+
+        .stat-card h2 {
+            font-size: 1.5rem; /* Lớn hơn */
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+            word-wrap: break-word;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Khoảng cách giữa icon và chữ */
+        }
+        .stat-card h2 svg {
+            width: 24px; /* Kích thước icon tối ưu */
+            height: 24px;
+            stroke: var(--text-light); /* Màu icon trùng với chữ */
+            fill: none; /* Đảm bảo không có fill mặc định */
+            stroke-width: 2; /* Độ dày nét icon */
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            flex-wrap: wrap;
+            border-bottom: 1px dashed #333; /* Đường kẻ đứt đoạn */
+            transition: background-color 0.2s ease;
+            position: relative;
+        }
+        .stat-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .stat-item:hover {
+            background-color: var(--hover-bg);
+            padding-left: 5px; /* Hiệu ứng trượt nhẹ */
+        }
+
+        .stat-label {
+            font-weight: bold;
+            flex: 1;
+            min-width: 60%;
+            color: var(--text-light);
+        }
+
+        .stat-value {
+            color: var(--text-gray);
+            text-align: right;
+            flex-shrink: 0;
+            font-size: 1.05rem; /* Hơi lớn hơn */
+        }
+
+        /* --- Yellow Marks/Labels (Chỉ áp dụng cho nội dung) --- */
+        .yellow-mark {
+            background-color: var(--accent-yellow);
+            color: var(--highlight-text);
+            padding: 3px 8px;
+            font-weight: bold;
+            border-radius: 3px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: inline-flex; /* Để căn chỉnh icon nếu có */
+            align-items: center;
+            gap: 5px;
+        }
+        .yellow-mark svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--highlight-text);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* --- Checkmark Indicator (Không phải màu vàng) --- */
+        .checkmark-indicator {
+            background-color: var(--highlight-bg); /* Nền trắng */
+            padding: 3px 5px;
+            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        .checkmark-indicator svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--highlight-text); /* Nét đen */
+            fill: none;
+            stroke-width: 2;
+        }
+
+        /* --- Đường phân chia --- */
+        .section-divider {
+            width: 100%;
+            height: 1px;
+            background-color: var(--divider-color);
+            margin: 50px 0;
+            position: relative;
+        }
+        .section-divider::before, .section-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px; /* Kích thước lớn hơn */
+            height: 15px;
+            background-color: var(--divider-color);
+            border-radius: 50%; /* Hình tròn */
+        }
+        .section-divider::before {
+            left: 0;
+        }
+        .section-divider::after {
+            right: 0;
+        }
+
+        /* --- Phần tiến trình và danh sách giai đoạn --- */
+        .progress-section h2, .stage-list h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 35px;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .progress-section h2 svg, .stage-list h2 svg {
+            width: 28px; /* Kích thước icon tối ưu */
+            height: 28px;
+            stroke: var(--text-light);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .progress-item {
+            margin-bottom: 30px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            transition: background-color 0.2s ease;
+        }
+        .progress-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .progress-item h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: var(--text-light);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px; /* Chiều cao lớn hơn */
+            background-color: var(--progress-bg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 8px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.6); /* Bóng đổ sâu hơn */
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--progress-fill);
+            transition: width 0.5s ease-out;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            font-weight: bold;
+            color: var(--highlight-text); /* Chữ màu đen trên thanh trắng */
+        }
+
+        .progress-text {
+            font-size: 1rem;
+            color: var(--text-gray);
+        }
+
+        /* --- Danh sách giai đoạn --- */
+        .stage-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0; /* Padding lớn hơn */
+            border-bottom: 1px solid #333;
+            flex-wrap: wrap;
+            transition: background-color 0.2s ease;
+        }
+        .stage-item:last-child {
+            border-bottom: none;
+        }
+        .stage-item:hover {
+            background-color: var(--hover-bg);
+            padding-left: 5px;
+        }
+
+        .stage-name {
+            font-weight: bold;
+            flex: 1;
+            min-width: 60%;
+            margin-bottom: 5px;
+            color: var(--text-light);
+        }
+
+        .stage-status {
+            color: var(--text-gray);
+            text-align: right;
+            flex-shrink: 0;
+            font-size: 0.95rem;
+        }
+
+        .stage-status.completed {
+            color: var(--text-light);
+        }
+        .stage-status.in-progress {
+            color: #aaa;
+        }
+        .stage-status.pending {
+            color: #666;
+        }
+
+        /* --- Footer --- */
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--divider-color);
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+        .footer p {
+            margin-bottom: 8px;
+        }
+        .footer strong {
+            color: var(--text-light);
+        }
+        .footer a {
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+        .footer a:hover {
+            color: var(--text-light);
+            text-decoration: underline;
+        }
+
+        /* --- Responsive Nâng Cao --- */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 10px;
+            }
+            .main-stats-container {
+                gap: 20px;
+            }
+            .main-stats-container .stat-card {
+                width: calc(50% - 10px); /* Điều chỉnh cho khoảng cách nhỏ hơn */
+            }
+            .stat-card { /* Áp dụng cho tất cả các thẻ */
+                padding: 18px;
+            }
+            .stat-card h2 {
+                font-size: 1.4rem;
+            }
+            .progress-section h2, .stage-list h2 {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            h1 {
+                font-size: 2.2rem;
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+            }
+            .subtitle {
+                font-size: 1.1rem;
+                margin-bottom: 30px;
+            }
+            .main-stats-container {
+                gap: 15px;
+            }
+            .main-stats-container .stat-card {
+                width: 100%; /* Xếp chồng trên mobile */
+            }
+            .stat-card { /* Áp dụng cho tất cả các thẻ */
+                padding: 15px;
+                min-height: auto;
+                margin-bottom: 15px; /* Khoảng cách dưới cho các thẻ khi xếp chồng */
+            }
+            .stat-card:last-of-type { /* Loại bỏ margin-bottom cho thẻ cuối cùng trong mỗi nhóm */
+                margin-bottom: 0;
+            }
+            .stat-card h2 {
+                font-size: 1.2rem;
+                margin-bottom: 10px;
+                padding-bottom: 8px;
+            }
+            .stat-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 5px 0;
+                margin-bottom: 5px;
+            }
+            .stat-label {
+                min-width: 100%;
+                margin-bottom: 2px;
+            }
+            .stat-value {
+                text-align: left;
+                font-size: 1rem;
+            }
+            .section-divider {
+                margin: 30px 0;
+            }
+            .progress-section h2, .stage-list h2 {
+                font-size: 1.6rem;
+                margin-bottom: 25px;
+            }
+            .progress-item h3 {
+                font-size: 1.1rem;
+            }
+            .progress-bar {
+                height: 20px;
+            }
+            .stage-item {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 8px 0;
+            }
+            .stage-name {
+                min-width: 100%;
+                margin-bottom: 3px;
+            }
+            .stage-status {
+                text-align: left;
+                font-size: 0.9rem;
+            }
+            .footer {
+                margin-top: 40px;
+                padding-top: 15px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+            .stat-card {
+                padding: 12px;
+            }
+            .stat-card h2 {
+                font-size: 1.1rem;
+            }
+            .progress-section h2, .stage-list h2 {
+                font-size: 1.4rem;
+            }
+            .progress-item h3 {
+                font-size: 1rem;
+            }
+            .section-divider {
+                margin: 25px 0;
+            }
+            .footer {
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐍 100 NGÀY PYTHON</h1>
+        <p class="subtitle">Thống Kê Dự Án - Được AI Biên Soạn</p>
+
+        <div class="main-stats-container">
+            <!-- THỐNG KÊ TỔNG QUAN -->
+            <div class="stat-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bar-chart-2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    THỐNG KÊ TỔNG QUAN
+                </h2>
+                <div class="stat-item">
+                    <span class="stat-label">Tổng số ngày học:</span>
+                    <span class="stat-value">100 ngày</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Giai đoạn hoàn thành:</span>
+                    <span class="stat-value yellow-mark">1/5</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Tiến độ tổng thể:</span>
+                    <span class="stat-value">17%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ngày đã triển khai:</span>
+                    <span class="stat-value">17/20</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Năm phát triển:</span>
+                    <span class="stat-value">2025</span>
+                </div>
+            </div>
+
+            <!-- THỐNG KÊ CODE THỰC TẾ -->
+            <div class="stat-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    THỐNG KÊ CODE THỰC TẾ
+                </h2>
+                <div class="stat-item">
+                    <span class="stat-label">Tổng dòng code:</span>
+                    <span class="stat-value yellow-mark">288,000+</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Files Python (.py):</span>
+                    <span class="stat-value">51</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Files Markdown (.md):</span>
+                    <span class="stat-value">16</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Tổng dung lượng:</span>
+                    <span class="stat-value">450+ KB</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Ước tính bài tập:</span>
+                    <span class="stat-value">150+</span>
+                </div>
+            </div>
+
+            <!-- TÍNH NĂNG ĐẶC BIỆT -->
+            <div class="stat-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-target"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                    TÍNH NĂNG ĐẶC BIỆT
+                </h2>
+                <div class="stat-item">
+                    <span class="stat-label">AI-Powered Learning:</span>
+                    <span class="stat-value checkmark-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Adaptive Quiz System:</span>
+                    <span class="stat-value checkmark-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Gamification:</span>
+                    <span class="stat-value checkmark-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Real-time Analytics:</span>
+                    <span class="stat-value checkmark-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Enterprise Architecture:</span>
+                    <span class="stat-value checkmark-indicator">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                </div>
+            </div>
+
+            <!-- THÀNH TÍCH HIỆN TẠI -->
+            <div class="stat-card">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17.18 21l-5.152-3.623L6.82 21l1.703-8.11"/></svg>
+                    THÀNH TÍCH HIỆN TẠI
+                </h2>
+                <div class="stat-item">
+                    <span class="stat-label">Ngày OOP hoàn chỉnh:</span>
+                    <span class="stat-value yellow-mark">15-17</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Files OOP tạo ra:</span>
+                    <span class="stat-value">10</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Dòng code OOP:</span>
+                    <span class="stat-value">8,900+</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Design Patterns:</span>
+                    <span class="stat-value">6+</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Enterprise Projects:</span>
+                    <span class="stat-value">3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="progress-section">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trending-up"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                TIẾN TRÌNH TỪNG GIAI ĐOẠN
+            </h2>
+            <div class="progress-item">
+                <h3>Giai đoạn 1: Cơ Bản (85%)</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 85%;">85%</div>
+                </div>
+                <p class="progress-text">Hoàn thành: 17/20 ngày (Chỉ còn ngày 18-20 chưa làm)</p>
+            </div>
+            <div class="progress-item">
+                <h3>Giai đoạn 2: Ứng Dụng (0%)</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;">0%</div>
+                </div>
+                <p class="progress-text">Hoàn thành: 0/20 ngày</p>
+            </div>
+            <div class="progress-item">
+                <h3>Giai đoạn 3: Thực Tế (0%)</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;">0%</div>
+                </div>
+                <p class="progress-text">Hoàn thành: 0/20 ngày</p>
+            </div>
+            <div class="progress-item">
+                <h3>Giai đoạn 4: Nâng Cao (0%)</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;">0%</div>
+                </div>
+                <p class="progress-text">Hoàn thành: 0/20 ngày</p>
+            </div>
+            <div class="progress-item">
+                <h3>Giai đoạn 5: Mastery (0%)</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 0%;">0%</div>
+                </div>
+                <p class="progress-text">Hoàn thành: 0/20 ngày</p>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="stage-list">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-list"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+                CHI TIẾT GIAI ĐOẠN 1 - CƠ BẢN
+            </h2>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 1-2: Hello World & I/O</span>
+                <span class="stage-status completed">✓ Hoàn thành (13 files)</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 3-4: Biến, Số học & String</span>
+                <span class="stage-status completed">✓ Hoàn thành (12 files)</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 5-6: Điều kiện If-Else</span>
+                <span class="stage-status completed">✓ Hoàn thành (7 files)</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 7-8: Vòng lặp</span>
+                <span class="stage-status completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 9-10: List, Tuple, Set</span>
+                <span class="stage-status completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 11-12: Dictionary</span>
+                <span class="stage-status completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 13-14: Hàm (Functions)</span>
+                <span class="stage-status completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 15-17: OOP (Object-Oriented Programming)</span>
+                <span class="stage-status completed yellow-mark">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    Hoàn thành - Enterprise Level (10 files)
+                </span>
+            </div>
+            <div class="stage-item">
+                <span class="stage-name">Ngày 18-20: Dự án máy tính</span>
+                <span class="stage-status pending">○ Chưa bắt đầu</span>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- PHÂN TÍCH CHI TIẾT NGÀY 15-17 (OOP) -->
+        <div class="stat-card">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                PHÂN TÍCH CHI TIẾT NGÀY 15-17 (OOP)
+            </h2>
+            <div class="stat-item">
+                <span class="stat-label">README.md:</span>
+                <span class="stat-value completed">✓ 8.3KB - 230 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">1-classes-objects-co-ban.md:</span>
+                <span class="stat-value completed">✓ 31KB - 992 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">2-inheritance-polymorphism.md:</span>
+                <span class="stat-value completed">✓ 40KB - 1,334 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">3-encapsulation-abstraction.md:</span>
+                <span class="stat-value completed">✓ 53KB - 1,598 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">bai-tap-1-classes-objects.py:</span>
+                <span class="stat-value completed">✓ 36KB - 1,040 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">bai-tap-2-inheritance.py:</span>
+                <span class="stat-value completed">✓ 42KB - 1,146 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">bai-tap-3-encapsulation.py:</span>
+                <span class="stat-value completed">✓ 49KB - 1,261 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">bai-tap-4-oop-tong-hop.py:</span>
+                <span class="stat-value completed">✓ 45KB - 1,266 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">du-an-thuc-hanh-nang-cao.py:</span>
+                <span class="stat-value completed">✓ 64KB - 1,833 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">quiz-tong-hop-oop.py:</span>
+                <span class="stat-value completed">✓ 52KB - 1,330 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tổng cộng OOP:</span>
+                <span class="stat-value yellow-mark">420KB - 11,030 dòng</span>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- PHÂN TÍCH CÁC NGÀY KHÁC -->
+        <div class="stat-card">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                PHÂN TÍCH CÁC NGÀY KHÁC
+            </h2>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 1-2 (Hello World):</span>
+                <span class="stat-value completed">✓ 13 files - 35KB</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 3-4 (Biến & String):</span>
+                <span class="stat-value completed">✓ 12 files - 78KB</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 5-6 (If-Else):</span>
+                <span class="stat-value completed">✓ 7 files - 25KB</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 7-8 (Vòng lặp):</span>
+                <span class="stat-value completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 9-10 (List/Tuple/Set):</span>
+                <span class="stat-value completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 11-12 (Dictionary):</span>
+                <span class="stat-value completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 13-14 (Functions):</span>
+                <span class="stat-value completed">✓ Hoàn thành</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Ngày 18-20 (Dự án máy tính):</span>
+                <span class="stat-value pending">○ Chưa triển khai</span>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- AI-POWERED FEATURES ĐANG HOẠT ĐỘNG -->
+        <div class="stat-card">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-brain"><path d="M12 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/><path d="M12 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19 12a7 7 0 0 0-7-7 7 7 0 0 0-7 7 7 7 0 0 0 7 7 7 7 0 0 0 7-7Z"/><path d="M5 12a2 2 0 1 0 0 4"/><path d="M19 12a2 2 0 1 0 0 4"/><path d="M12 2a2 2 0 1 0 0 4"/><path d="M12 18a2 2 0 1 0 0 4"/></svg>
+                AI-POWERED FEATURES ĐANG HOẠT ĐỘNG
+            </h2>
+            <div class="stat-item">
+                <span class="stat-label">Adaptive Learning Engine:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Dynamic Difficulty Adjustment:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Personalized Learning Path:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Real-time Analytics:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Smart Recommendations:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Gamification System:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Achievement Tracking:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Progress Visualization:</span>
+                <span class="stat-value checkmark-indicator">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ENTERPRISE ARCHITECTURE FEATURES -->
+        <div class="stat-card">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><path d="M9.5 16h5"/><path d="M9.5 12h5"/><path d="M9.5 8h5"/></svg>
+                ENTERPRISE ARCHITECTURE FEATURES
+            </h2>
+            <div class="stat-item">
+                <span class="stat-label">Clean Architecture:</span>
+                <span class="stat-value completed">✓ Implemented</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Design Patterns:</span>
+                <span class="stat-value completed">✓ Singleton, Factory, Observer, Strategy</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">SOLID Principles:</span>
+                <span class="stat-value completed">✓ Applied</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Dependency Injection:</span>
+                <span class="stat-value completed">✓ Implemented</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Event-Driven Architecture:</span>
+                <span class="stat-value completed">✓ Implemented</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Comprehensive Testing:</span>
+                <span class="stat-value completed">✓ Unit, Integration, Performance</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Security Testing:</span>
+                <span class="stat-value completed">✓ Validation, Encapsulation</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Command Pattern:</span>
+                <span class="stat-value completed">✓ Undo/Redo Support</span>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- THỐNG KÊ REPOSITORY -->
+        <div class="stat-card">
+            <h2>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-git-branch"><line x1="6" x2="6" y1="3" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+                THỐNG KÊ REPOSITORY
+            </h2>
+            <div class="stat-item">
+                <span class="stat-label">Tổng files trong repo:</span>
+                <span class="stat-value">70+</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tổng dung lượng:</span>
+                <span class="stat-value">500+ KB</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Commits ước tính:</span>
+                <span class="stat-value">50+</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Branches:</span>
+                <span class="stat-value">main</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Languages:</span>
+                <span class="stat-value">Python, Markdown, HTML</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">License:</span>
+                <span class="stat-value">MIT</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">README.md chính:</span>
+                <span class="stat-value">9.7KB - 256 dòng</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Trang thống kê này:</span>
+                <span class="stat-value">18KB - 485 dòng</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>📅 <strong>Năm phát triển:</strong> 2025</p>
+            <p>👨‍💻 <strong>Tác giả:</strong> tanbaycu</p>
+            <p>🤖 <strong>Powered by:</strong> AI Technology</p>
+            <p>📝 <strong>Ngôn ngữ:</strong> Tiếng Việt</p>
+            <p>⭐ <strong>Cấp độ:</strong> Beginner to Expert</p>
+            <p>🔗 <strong>Repository:</strong> <a href="https://github.com/tanbaycu/100days-Python-of-tanbaycu" target="_blank" rel="noopener noreferrer">github.com/tanbaycu/100days-Python-of-tanbaycu</a></p>
+            <p>📱 <strong>Responsive:</strong> Desktop, Tablet, Mobile</p>
+            <p>🎯 <strong>Cập nhật lần cuối:</strong> 2025</p>
+        </div>
+    </div>
+</body>
+</html>
