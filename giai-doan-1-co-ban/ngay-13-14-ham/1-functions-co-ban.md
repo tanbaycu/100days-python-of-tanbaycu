@@ -1,304 +1,110 @@
-# 📚 LÝ THUYẾT 1: FUNCTIONS CƠ BẢN - TỪ ĐƠN GIẢN ĐẾN NÂNG CAO
+# Lý Thuyết 1: Functions Cơ Bản
 
-## 🎯 MỤC TIÊU HỌC TẬP
+## Mục Tiêu Học Tập
 
 Sau bài học này, bạn sẽ:
-- ✅ Hiểu rõ khái niệm function và tại sao cần thiết
-- ✅ Nắm vững cú pháp và cấu trúc của functions
-- ✅ Thành thạo return values và side effects
-- ✅ Áp dụng best practices trong việc viết functions
-- ✅ Xử lý được các tình huống phức tạp với functions
+- Hiểu rõ khái niệm và tầm quan trọng của functions
+- Nắm vững cú pháp khai báo và sử dụng functions
+- Biết cách viết functions hiệu quả và clean code
+- Áp dụng functions vào các bài toán thực tế
 
----
+## 1. Functions Là Gì?
 
-## 🌟 PHẦN I: KHÁI NIỆM VÀ MOTIVATION
+### Khái Niệm
+Function (hàm) là một khối code được đặt tên, có thể được gọi nhiều lần trong chương trình. Functions giúp:
+- Tái sử dụng code
+- Tổ chức code rõ ràng
+- Dễ bảo trì và debug
+- Chia nhỏ bài toán phức tạp
 
-### 🤔 Tại Sao Cần Functions?
+### Tại Sao Cần Functions?
 
-Hãy tưởng tượng bạn đang viết một chương trình tính toán điểm trung bình của học sinh:
-
+**Không có Functions:**
 ```python
-# ❌ Code không sử dụng functions - Lặp lại và khó maintain
-student1_scores = [8, 7, 9, 6, 8]
-student1_total = 0
-for score in student1_scores:
-    student1_total += score
-student1_average = student1_total / len(student1_scores)
-print(f"Học sinh 1: {student1_average}")
+# Tính diện tích hình chữ nhật 1
+dai_1 = 10
+rong_1 = 5
+dien_tich_1 = dai_1 * rong_1
+print(f"Diện tích 1: {dien_tich_1}")
 
-student2_scores = [9, 8, 7, 8, 9]
-student2_total = 0
-for score in student2_scores:
-    student2_total += score
-student2_average = student2_total / len(student2_scores)
-print(f"Học sinh 2: {student2_average}")
+# Tính diện tích hình chữ nhật 2
+dai_2 = 8
+rong_2 = 6
+dien_tich_2 = dai_2 * rong_2
+print(f"Diện tích 2: {dien_tich_2}")
 
-# ... và còn 100 học sinh nữa 😱
+# Tính diện tích hình chữ nhật 3
+dai_3 = 12
+rong_3 = 4
+dien_tich_3 = dai_3 * rong_3
+print(f"Diện tích 3: {dien_tich_3}")
 ```
 
-**Vấn đề của code trên:**
-- 🔄 **Lặp lại code**: Cùng một logic được viết nhiều lần
-- 🐛 **Khó debug**: Nếu có lỗi, phải sửa ở nhiều nơi
-- 📈 **Không scalable**: Thêm học sinh mới = thêm code mới
-- 🔧 **Khó maintain**: Thay đổi logic = sửa toàn bộ code
-
+**Có Functions:**
 ```python
-# ✅ Code sử dụng functions - Clean và maintainable
-def calculate_average(scores):
-    """Tính điểm trung bình của một danh sách điểm"""
-    if not scores:  # Xử lý edge case
-        return 0
-    return sum(scores) / len(scores)
-
-# Sử dụng function
-student1_average = calculate_average([8, 7, 9, 6, 8])
-student2_average = calculate_average([9, 8, 7, 8, 9])
-student3_average = calculate_average([7, 8, 9, 7, 8])
-
-print(f"Học sinh 1: {student1_average}")
-print(f"Học sinh 2: {student2_average}")
-print(f"Học sinh 3: {student3_average}")
-```
-
-**Lợi ích của functions:**
-- 🔄 **DRY Principle**: Don't Repeat Yourself
-- 🧩 **Modularity**: Chia code thành các module nhỏ
-- 🔧 **Maintainability**: Dễ sửa đổi và cập nhật
-- 🧪 **Testability**: Dễ test từng phần riêng biệt
-- 📖 **Readability**: Code dễ đọc và hiểu
-
-### 🏗️ Khái Niệm Function
-
-**Function** là một khối code được đặt tên, có thể:
-- Nhận **input** (parameters/arguments)
-- Thực hiện **xử lý** (processing)
-- Trả về **output** (return value)
-- Có **side effects** (tác động bên ngoài)
-
-```python
-# Anatomy của một function
-def function_name(parameters):
-    """Docstring - mô tả function"""
-    # Function body - xử lý logic
-    return result  # Optional return value
-```
-
----
-
-## 🔧 PHẦN II: CÚ PHÁP VÀ CẤU TRÚC CHI TIẾT
-
-### 1. 📝 Cú Pháp Cơ Bản
-
-```python
-def greet():
-    """Function đơn giản nhất - không parameter, không return"""
-    print("Xin chào!")
-
-# Gọi function
-greet()  # Output: Xin chào!
-```
-
-**Phân tích cú pháp:**
-- `def`: Keyword để định nghĩa function
-- `greet`: Tên function (snake_case convention)
-- `()`: Dấu ngoặc chứa parameters (rỗng nếu không có)
-- `:`: Dấu hai chấm bắt đầu function body
-- `"""..."""`: Docstring (optional nhưng recommended)
-- Function body: Code thực thi, phải được indent
-
-### 2. 🎯 Function Với Parameters
-
-```python
-def greet_person(name):
-    """Function với 1 parameter"""
-    print(f"Xin chào {name}!")
-
-def greet_person_formal(name, title):
-    """Function với nhiều parameters"""
-    print(f"Xin chào {title} {name}!")
+def tinh_dien_tich(dai, rong):
+    """Tính diện tích hình chữ nhật"""
+    return dai * rong
 
 # Sử dụng
-greet_person("An")                    # Output: Xin chào An!
-greet_person_formal("Minh", "Anh")    # Output: Xin chào Anh Minh!
+dien_tich_1 = tinh_dien_tich(10, 5)
+dien_tich_2 = tinh_dien_tich(8, 6)
+dien_tich_3 = tinh_dien_tich(12, 4)
+
+print(f"Diện tích 1: {dien_tich_1}")
+print(f"Diện tích 2: {dien_tich_2}")
+print(f"Diện tích 3: {dien_tich_3}")
 ```
 
-**Quy tắc đặt tên parameters:**
-- Sử dụng `snake_case`: `user_name`, `total_score`
-- Tên có ý nghĩa: `age` thay vì `a`, `student_list` thay vì `lst`
-- Tránh keywords: không dùng `class`, `def`, `return`
+## 2. Cú Pháp Function
 
-### 3. 🔄 Function Với Return Value
-
+### Cú Pháp Cơ Bản
 ```python
-def add_numbers(a, b):
-    """Cộng hai số và trả về kết quả"""
-    result = a + b
-    return result
-
-def multiply_numbers(a, b):
-    """Nhân hai số - return trực tiếp"""
-    return a * b
-
-# Sử dụng return value
-sum_result = add_numbers(5, 3)        # sum_result = 8
-product = multiply_numbers(4, 7)      # product = 28
-print(f"Tổng: {sum_result}, Tích: {product}")
+def ten_function(parameter1, parameter2, ...):
+    """Docstring - mô tả function"""
+    # Thân function
+    return gia_tri_tra_ve  # Tùy chọn
 ```
 
-**Quan trọng về return:**
-- Function không có `return` sẽ trả về `None`
-- `return` dừng execution của function ngay lập tức
-- Có thể return nhiều giá trị: `return a, b, c`
-
-### 4. 🎨 Multiple Return Values
-
+### Ví Dụ Cụ Thể
 ```python
-def analyze_numbers(numbers):
-    """Phân tích danh sách số và trả về nhiều thông tin"""
-    if not numbers:
-        return 0, 0, 0, 0  # min, max, sum, avg
-    
-    min_val = min(numbers)
-    max_val = max(numbers)
-    sum_val = sum(numbers)
-    avg_val = sum_val / len(numbers)
-    
-    return min_val, max_val, sum_val, avg_val
+def chao_hoi(ten):
+    """Chào hỏi một người"""
+    return f"Xin chào {ten}!"
 
-# Sử dụng multiple return values
-scores = [85, 92, 78, 96, 88]
+def cong_hai_so(a, b):
+    """Cộng hai số"""
+    ket_qua = a + b
+    return ket_qua
 
-# Cách 1: Unpack trực tiếp
-min_score, max_score, total_score, avg_score = analyze_numbers(scores)
-print(f"Min: {min_score}, Max: {max_score}, Avg: {avg_score}")
-
-# Cách 2: Nhận tuple
-result = analyze_numbers(scores)
-print(f"Kết quả: {result}")  # (78, 96, 439, 87.8)
+def in_thong_tin():
+    """In thông tin không có return"""
+    print("Đây là một function không có return")
 ```
 
----
+## 3. Các Loại Functions
 
-## 🌍 PHẦN III: SCOPE VÀ NAMESPACE CỞ BẢN
-
-### 1. 🏠 Local vs Global Variables
-
+### 3.1 Function Không Có Return
 ```python
-# Global variable
-global_message = "Tôi là global variable"
+def in_menu():
+    """In menu lựa chọn"""
+    print("1. Thêm sản phẩm")
+    print("2. Xóa sản phẩm")
+    print("3. Thoát")
 
-def demo_scope():
-    # Local variable
-    local_message = "Tôi là local variable"
-    print(f"Trong function: {local_message}")
-    print(f"Trong function: {global_message}")  # Có thể đọc global
-
-demo_scope()
-print(f"Ngoài function: {global_message}")     # OK
-# print(f"Ngoài function: {local_message}")    # ❌ Error!
+# Sử dụng
+in_menu()
 ```
 
-**Quy tắc scope:**
-- **Local variables**: Chỉ tồn tại trong function
-- **Global variables**: Có thể đọc từ function
-- **Không thể modify global** từ function (trừ khi dùng `global`)
-
-### 2. 🔄 Modifying Global Variables
-
+### 3.2 Function Có Return
 ```python
-counter = 0  # Global variable
-
-def increment_counter():
-    global counter  # Khai báo sử dụng global variable
-    counter += 1
-    print(f"Counter trong function: {counter}")
-
-def get_counter():
-    return counter  # Chỉ đọc, không cần global
-
-print(f"Counter ban đầu: {counter}")
-increment_counter()  # Counter trong function: 1
-print(f"Counter sau khi increment: {counter}")  # 1
-```
-
-**Best Practice:**
-- 🚫 **Tránh global variables** khi có thể
-- ✅ **Sử dụng parameters và return values** thay vì global
-- ✅ **Nếu cần global**, khai báo rõ ràng với `global`
-
-### 3. 🎯 Parameter Passing - Call by Value vs Reference
-
-```python
-def modify_number(x):
-    """Integers là immutable - không thể modify"""
-    x = x + 10
-    print(f"Trong function: {x}")
-    return x
-
-def modify_list(lst):
-    """Lists là mutable - có thể modify"""
-    lst.append(4)
-    print(f"Trong function: {lst}")
-
-# Test với number (immutable)
-num = 5
-result = modify_number(num)
-print(f"Sau function - num: {num}, result: {result}")
-# Output: num vẫn là 5, result là 15
-
-# Test với list (mutable)
-my_list = [1, 2, 3]
-modify_list(my_list)
-print(f"Sau function - my_list: {my_list}")
-# Output: my_list đã thay đổi thành [1, 2, 3, 4]
-```
-
-**Hiểu về parameter passing:**
-- **Immutable objects** (int, str, tuple): Không thể modify trong function
-- **Mutable objects** (list, dict, set): Có thể modify trong function
-- **Best practice**: Tránh modify mutable parameters, return new objects
-
----
-
-## 📚 PHẦN IV: DOCSTRINGS VÀ DOCUMENTATION
-
-### 1. 📖 Viết Docstring Hiệu Quả
-
-```python
-def calculate_bmi(weight, height):
-    """
-    Tính chỉ số BMI (Body Mass Index).
-    
-    Args:
-        weight (float): Cân nặng tính bằng kg
-        height (float): Chiều cao tính bằng mét
-    
-    Returns:
-        float: Chỉ số BMI
-    
-    Raises:
-        ValueError: Khi weight hoặc height <= 0
-        
-    Example:
-        >>> calculate_bmi(70, 1.75)
-        22.857142857142858
-    """
-    if weight <= 0 or height <= 0:
-        raise ValueError("Cân nặng và chiều cao phải > 0")
-    
-    bmi = weight / (height ** 2)
+def tinh_bmi(can_nang, chieu_cao):
+    """Tính chỉ số BMI"""
+    bmi = can_nang / (chieu_cao ** 2)
     return bmi
 
-def categorize_bmi(bmi):
-    """
-    Phân loại BMI theo tiêu chuẩn WHO.
-    
-    Args:
-        bmi (float): Chỉ số BMI
-    
-    Returns:
-        str: Phân loại BMI ('Thiếu cân', 'Bình thường', 'Thừa cân', 'Béo phì')
-    """
+def phan_loai_bmi(bmi):
+    """Phân loại BMI"""
     if bmi < 18.5:
         return "Thiếu cân"
     elif bmi < 25:
@@ -309,530 +115,356 @@ def categorize_bmi(bmi):
         return "Béo phì"
 
 # Sử dụng
-try:
-    bmi = calculate_bmi(70, 1.75)
-    category = categorize_bmi(bmi)
-    print(f"BMI: {bmi:.2f} - Phân loại: {category}")
-except ValueError as e:
-    print(f"Lỗi: {e}")
+bmi = tinh_bmi(70, 1.75)
+phan_loai = phan_loai_bmi(bmi)
+print(f"BMI: {bmi:.2f} - {phan_loai}")
 ```
 
-### 2. 🔍 Accessing Docstrings
-
+### 3.3 Function Return Nhiều Giá Trị
 ```python
-# Xem docstring
-print(calculate_bmi.__doc__)
+def tinh_toan_co_ban(a, b):
+    """Thực hiện các phép tính cơ bản"""
+    cong = a + b
+    tru = a - b
+    nhan = a * b
+    chia = a / b if b != 0 else None
+    return cong, tru, nhan, chia
 
-# Sử dụng help()
-help(calculate_bmi)
-
-# Trong IPython/Jupyter
-# calculate_bmi?
+# Sử dụng
+ket_qua_cong, ket_qua_tru, ket_qua_nhan, ket_qua_chia = tinh_toan_co_ban(10, 5)
+print(f"Cộng: {ket_qua_cong}")
+print(f"Trừ: {ket_qua_tru}")
+print(f"Nhân: {ket_qua_nhan}")
+print(f"Chia: {ket_qua_chia}")
 ```
 
----
+## 4. Scope (Phạm Vi) Biến
 
-## 🎯 PHẦN V: BEST PRACTICES VÀ COMMON PITFALLS
-
-### 1. ✅ Best Practices
-
-#### A. Function Naming Convention
-
+### 4.1 Local Scope
 ```python
-# ✅ Good naming
-def calculate_tax(income, tax_rate):
-    """Tính thuế thu nhập"""
-    return income * tax_rate
+def test_local():
+    x = 10  # Biến local
+    print(f"Trong function: {x}")
 
-def is_valid_email(email):
-    """Kiểm tra email hợp lệ"""
-    return "@" in email and "." in email
-
-def get_user_by_id(user_id):
-    """Lấy thông tin user theo ID"""
-    # Implementation here
-    pass
-
-# ❌ Bad naming
-def calc(x, y):  # Tên không rõ ràng
-    return x * y
-
-def func1(data):  # Tên generic
-    return data.upper()
+test_local()
+# print(x)  # Lỗi! x không tồn tại ngoài function
 ```
 
-#### B. Function Length và Complexity
-
+### 4.2 Global Scope
 ```python
-# ✅ Good - Single responsibility
-def validate_password(password):
-    """Kiểm tra mật khẩu hợp lệ"""
-    if len(password) < 8:
-        return False, "Mật khẩu phải có ít nhất 8 ký tự"
-    if not any(c.isupper() for c in password):
-        return False, "Mật khẩu phải có ít nhất 1 chữ hoa"
-    if not any(c.islower() for c in password):
-        return False, "Mật khẩu phải có ít nhất 1 chữ thường"
-    if not any(c.isdigit() for c in password):
-        return False, "Mật khẩu phải có ít nhất 1 số"
-    return True, "Mật khẩu hợp lệ"
+y = 20  # Biến global
 
-def hash_password(password):
-    """Mã hóa mật khẩu"""
-    # Implementation here
-    pass
+def test_global():
+    print(f"Trong function: {y}")  # Có thể đọc biến global
 
-def create_user(username, password, email):
-    """Tạo user mới"""
-    # Validate password
-    is_valid, message = validate_password(password)
-    if not is_valid:
-        return False, message
-    
-    # Hash password
-    hashed_password = hash_password(password)
-    
-    # Create user
-    # Implementation here
-    return True, "User created successfully"
+test_global()
+print(f"Ngoài function: {y}")
 ```
 
-#### C. Error Handling
-
+### 4.3 Thay Đổi Biến Global
 ```python
-def divide_numbers(a, b):
+count = 0  # Biến global
+
+def tang_count():
+    global count
+    count += 1
+    print(f"Count hiện tại: {count}")
+
+tang_count()  # Count hiện tại: 1
+tang_count()  # Count hiện tại: 2
+```
+
+## 5. Docstring - Tài Liệu Hóa Function
+
+### Cách Viết Docstring
+```python
+def tinh_lai_suat(tien_goc, lai_suat, thoi_gian):
     """
-    Chia hai số với error handling.
+    Tính lãi suất đơn giản
     
     Args:
-        a (float): Số bị chia
-        b (float): Số chia
+        tien_goc (float): Số tiền gốc
+        lai_suat (float): Lãi suất theo năm (%)
+        thoi_gian (int): Thời gian (năm)
     
     Returns:
-        float: Kết quả phép chia
+        float: Số tiền lãi
     
-    Raises:
-        TypeError: Khi a hoặc b không phải số
-        ZeroDivisionError: Khi b = 0
+    Example:
+        >>> tinh_lai_suat(1000000, 5, 2)
+        100000.0
     """
-    # Type checking
-    if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-        raise TypeError("Cả a và b phải là số")
+    lai = tien_goc * (lai_suat / 100) * thoi_gian
+    return lai
+
+# Xem docstring
+print(tinh_lai_suat.__doc__)
+help(tinh_lai_suat)
+```
+
+## 6. Best Practices
+
+### 6.1 Đặt Tên Function
+```python
+# Tốt
+def tinh_dien_tich_hinh_tron(ban_kinh):
+    return 3.14159 * ban_kinh ** 2
+
+def kiem_tra_so_chan(so):
+    return so % 2 == 0
+
+# Không tốt
+def func1(x):
+    return 3.14159 * x ** 2
+
+def f(n):
+    return n % 2 == 0
+```
+
+### 6.2 Function Chỉ Làm Một Việc
+```python
+# Tốt - Mỗi function làm một việc
+def doc_file(ten_file):
+    """Đọc nội dung file"""
+    with open(ten_file, 'r', encoding='utf-8') as file:
+        return file.read()
+
+def xu_ly_du_lieu(du_lieu):
+    """Xử lý dữ liệu"""
+    return du_lieu.strip().upper()
+
+def ghi_file(ten_file, noi_dung):
+    """Ghi nội dung vào file"""
+    with open(ten_file, 'w', encoding='utf-8') as file:
+        file.write(noi_dung)
+
+# Không tốt - Function làm quá nhiều việc
+def xu_ly_file(ten_file_doc, ten_file_ghi):
+    """Function làm quá nhiều việc"""
+    # Đọc file
+    with open(ten_file_doc, 'r', encoding='utf-8') as file:
+        du_lieu = file.read()
     
-    # Zero division check
+    # Xử lý dữ liệu
+    du_lieu = du_lieu.strip().upper()
+    
+    # Ghi file
+    with open(ten_file_ghi, 'w', encoding='utf-8') as file:
+        file.write(du_lieu)
+```
+
+## 7. Ví Dụ Thực Tế
+
+### 7.1 Hệ Thống Quản Lý Lương
+```python
+def tinh_luong_co_ban(luong_co_ban, so_ngay_lam):
+    """Tính lương cơ bản"""
+    return luong_co_ban * so_ngay_lam
+
+def tinh_thuong(luong_co_ban, hieu_suat):
+    """Tính thưởng theo hiệu suất"""
+    if hieu_suat >= 90:
+        return luong_co_ban * 0.2
+    elif hieu_suat >= 80:
+        return luong_co_ban * 0.1
+    elif hieu_suat >= 70:
+        return luong_co_ban * 0.05
+    else:
+        return 0
+
+def tinh_thue(tong_luong):
+    """Tính thuế thu nhập"""
+    if tong_luong <= 11000000:
+        return 0
+    elif tong_luong <= 25000000:
+        return (tong_luong - 11000000) * 0.05
+    else:
+        return 700000 + (tong_luong - 25000000) * 0.1
+
+def tinh_luong_thuc_linh(luong_co_ban, so_ngay_lam, hieu_suat):
+    """Tính lương thực lĩnh"""
+    luong_cb = tinh_luong_co_ban(luong_co_ban, so_ngay_lam)
+    thuong = tinh_thuong(luong_co_ban, hieu_suat)
+    tong_luong = luong_cb + thuong
+    thue = tinh_thue(tong_luong)
+    thuc_linh = tong_luong - thue
+    
+    return {
+        'luong_co_ban': luong_cb,
+        'thuong': thuong,
+        'tong_luong': tong_luong,
+        'thue': thue,
+        'thuc_linh': thuc_linh
+    }
+
+# Sử dụng
+ket_qua = tinh_luong_thuc_linh(1000000, 22, 85)
+print(f"Lương cơ bản: {ket_qua['luong_co_ban']:,}")
+print(f"Thưởng: {ket_qua['thuong']:,}")
+print(f"Tổng lương: {ket_qua['tong_luong']:,}")
+print(f"Thuế: {ket_qua['thue']:,}")
+print(f"Thực lĩnh: {ket_qua['thuc_linh']:,}")
+```
+
+### 7.2 Hệ Thống Phân Tích Điểm Học Sinh
+```python
+def tinh_diem_trung_binh(diem_list):
+    """Tính điểm trung bình"""
+    if not diem_list:
+        return 0
+    return sum(diem_list) / len(diem_list)
+
+def xep_loai_hoc_luc(diem_tb):
+    """Xếp loại học lực"""
+    if diem_tb >= 9:
+        return "Xuất sắc"
+    elif diem_tb >= 8:
+        return "Giỏi"
+    elif diem_tb >= 6.5:
+        return "Khá"
+    elif diem_tb >= 5:
+        return "Trung bình"
+    else:
+        return "Yếu"
+
+def kiem_tra_len_lop(diem_tb, diem_toan, diem_van):
+    """Kiểm tra điều kiện lên lớp"""
+    if diem_tb >= 5 and diem_toan >= 4 and diem_van >= 4:
+        return True
+    return False
+
+def phan_tich_hoc_sinh(ten, diem_toan, diem_van, diem_anh, diem_ly, diem_hoa):
+    """Phân tích toàn diện học sinh"""
+    diem_list = [diem_toan, diem_van, diem_anh, diem_ly, diem_hoa]
+    diem_tb = tinh_diem_trung_binh(diem_list)
+    hoc_luc = xep_loai_hoc_luc(diem_tb)
+    len_lop = kiem_tra_len_lop(diem_tb, diem_toan, diem_van)
+    
+    return {
+        'ten': ten,
+        'diem_trung_binh': diem_tb,
+        'hoc_luc': hoc_luc,
+        'len_lop': len_lop,
+        'diem_chi_tiet': {
+            'toan': diem_toan,
+            'van': diem_van,
+            'anh': diem_anh,
+            'ly': diem_ly,
+            'hoa': diem_hoa
+        }
+    }
+
+# Sử dụng
+ket_qua = phan_tich_hoc_sinh("Nguyễn Văn A", 8.5, 7.0, 6.5, 8.0, 7.5)
+print(f"Học sinh: {ket_qua['ten']}")
+print(f"Điểm trung bình: {ket_qua['diem_trung_binh']:.2f}")
+print(f"Học lực: {ket_qua['hoc_luc']}")
+print(f"Lên lớp: {'Có' if ket_qua['len_lop'] else 'Không'}")
+```
+
+## 8. Lỗi Thường Gặp
+
+### 8.1 Quên Return
+```python
+# Sai
+def tinh_tong(a, b):
+    ket_qua = a + b
+    # Quên return
+
+# Đúng
+def tinh_tong(a, b):
+    ket_qua = a + b
+    return ket_qua
+```
+
+### 8.2 Thay Đổi Biến Global Không Đúng Cách
+```python
+# Sai
+count = 0
+def tang_count():
+    count = count + 1  # Lỗi UnboundLocalError
+
+# Đúng
+count = 0
+def tang_count():
+    global count
+    count = count + 1
+```
+
+### 8.3 Đặt Tên Trùng Với Built-in Functions
+```python
+# Sai
+def len(my_list):
+    return "Độ dài custom"
+
+# Đúng
+def tinh_do_dai(my_list):
+    return len(my_list)
+```
+
+## 9. Bài Tập Thực Hành
+
+### Bài 1: Máy Tính Đơn Giản
+```python
+def cong(a, b):
+    return a + b
+
+def tru(a, b):
+    return a - b
+
+def nhan(a, b):
+    return a * b
+
+def chia(a, b):
     if b == 0:
-        raise ZeroDivisionError("Không thể chia cho 0")
-    
+        return "Không thể chia cho 0"
     return a / b
 
-# Sử dụng với error handling
-try:
-    result = divide_numbers(10, 2)
-    print(f"Kết quả: {result}")
-except (TypeError, ZeroDivisionError) as e:
-    print(f"Lỗi: {e}")
-```
-
-### 2. ❌ Common Pitfalls
-
-#### A. Mutable Default Arguments
-
-```python
-# ❌ Dangerous - Mutable default argument
-def add_item(item, target_list=[]):
-    """NGUY HIỂM: Default list được share giữa các lần gọi"""
-    target_list.append(item)
-    return target_list
-
-# Test
-list1 = add_item("apple")
-list2 = add_item("banana")
-print(list1)  # ['apple', 'banana'] - Unexpected!
-print(list2)  # ['apple', 'banana'] - Same list!
-
-# ✅ Safe - Immutable default argument
-def add_item_safe(item, target_list=None):
-    """An toàn: Tạo list mới mỗi lần gọi"""
-    if target_list is None:
-        target_list = []
-    target_list.append(item)
-    return target_list
-
-# Test
-list1 = add_item_safe("apple")
-list2 = add_item_safe("banana")
-print(list1)  # ['apple'] - Correct!
-print(list2)  # ['banana'] - Correct!
-```
-
-#### B. Modifying Global State
-
-```python
-# ❌ Bad - Modifying global state
-total_score = 0
-
-def add_score(score):
-    """Thêm điểm vào tổng điểm global"""
-    global total_score
-    total_score += score
-    return total_score
-
-# ✅ Good - Pure function
-def calculate_total_score(current_total, new_score):
-    """Tính tổng điểm mới"""
-    return current_total + new_score
-
-# Usage
-total_score = 0
-total_score = calculate_total_score(total_score, 85)
-total_score = calculate_total_score(total_score, 92)
-```
-
-#### C. Too Many Parameters
-
-```python
-# ❌ Bad - Too many parameters
-def create_user(first_name, last_name, email, phone, address, city, 
-                country, postal_code, age, gender, occupation):
-    """Quá nhiều parameters - khó sử dụng"""
-    pass
-
-# ✅ Good - Use data structure
-def create_user(user_info):
-    """Sử dụng dictionary cho user info"""
-    required_fields = ['first_name', 'last_name', 'email']
+def may_tinh():
+    """Máy tính đơn giản"""
+    print("Chọn phép tính:")
+    print("1. Cộng")
+    print("2. Trừ")
+    print("3. Nhân")
+    print("4. Chia")
     
-    for field in required_fields:
-        if field not in user_info:
-            raise ValueError(f"Missing required field: {field}")
+    lua_chon = input("Nhập lựa chọn (1-4): ")
     
-    # Process user creation
-    pass
-
-# Usage
-user_data = {
-    'first_name': 'John',
-    'last_name': 'Doe',
-    'email': 'john@example.com',
-    'phone': '123-456-7890',
-    'address': '123 Main St'
-}
-create_user(user_data)
-```
-
----
-
-## 🔬 PHẦN VI: TÌNH HUỐNG THỰC TẾ VÀ ỨNG DỤNG
-
-### 1. 🧮 Tình Huống: Hệ Thống Tính Lương
-
-```python
-def calculate_base_salary(hours_worked, hourly_rate):
-    """Tính lương cơ bản"""
-    return hours_worked * hourly_rate
-
-def calculate_overtime_pay(hours_worked, hourly_rate, overtime_threshold=40):
-    """Tính lương làm thêm giờ"""
-    if hours_worked <= overtime_threshold:
-        return 0
-    
-    overtime_hours = hours_worked - overtime_threshold
-    overtime_rate = hourly_rate * 1.5  # 150% lương cơ bản
-    return overtime_hours * overtime_rate
-
-def calculate_tax(gross_salary, tax_rate=0.2):
-    """Tính thuế thu nhập"""
-    return gross_salary * tax_rate
-
-def calculate_net_salary(hours_worked, hourly_rate, tax_rate=0.2):
-    """Tính lương thực lĩnh"""
-    base_salary = calculate_base_salary(hours_worked, hourly_rate)
-    overtime_pay = calculate_overtime_pay(hours_worked, hourly_rate)
-    gross_salary = base_salary + overtime_pay
-    tax = calculate_tax(gross_salary, tax_rate)
-    net_salary = gross_salary - tax
-    
-    return {
-        'base_salary': base_salary,
-        'overtime_pay': overtime_pay,
-        'gross_salary': gross_salary,
-        'tax': tax,
-        'net_salary': net_salary
-    }
-
-# Sử dụng
-salary_info = calculate_net_salary(45, 20)  # 45 giờ, 20$/giờ
-print(f"Lương cơ bản: ${salary_info['base_salary']}")
-print(f"Lương overtime: ${salary_info['overtime_pay']}")
-print(f"Lương gross: ${salary_info['gross_salary']}")
-print(f"Thuế: ${salary_info['tax']}")
-print(f"Lương net: ${salary_info['net_salary']}")
-```
-
-### 2. 📊 Tình Huống: Phân Tích Dữ Liệu Học Sinh
-
-```python
-def calculate_grade_statistics(grades):
-    """Tính thống kê điểm số"""
-    if not grades:
-        return None
-    
-    return {
-        'count': len(grades),
-        'min': min(grades),
-        'max': max(grades),
-        'average': sum(grades) / len(grades),
-        'median': sorted(grades)[len(grades) // 2]
-    }
-
-def categorize_grade(grade):
-    """Phân loại điểm số"""
-    if grade >= 9:
-        return 'Xuất sắc'
-    elif grade >= 8:
-        return 'Giỏi'
-    elif grade >= 6.5:
-        return 'Khá'
-    elif grade >= 5:
-        return 'Trung bình'
+    if lua_chon in ['1', '2', '3', '4']:
+        so_1 = float(input("Nhập số thứ nhất: "))
+        so_2 = float(input("Nhập số thứ hai: "))
+        
+        if lua_chon == '1':
+            print(f"Kết quả: {cong(so_1, so_2)}")
+        elif lua_chon == '2':
+            print(f"Kết quả: {tru(so_1, so_2)}")
+        elif lua_chon == '3':
+            print(f"Kết quả: {nhan(so_1, so_2)}")
+        elif lua_chon == '4':
+            print(f"Kết quả: {chia(so_1, so_2)}")
     else:
-        return 'Yếu'
+        print("Lựa chọn không hợp lệ!")
 
-def generate_grade_report(student_grades):
-    """Tạo báo cáo điểm số chi tiết"""
-    report = {}
-    
-    for subject, grades in student_grades.items():
-        stats = calculate_grade_statistics(grades)
-        if stats:
-            report[subject] = {
-                'statistics': stats,
-                'category': categorize_grade(stats['average']),
-                'grade_distribution': {}
-            }
-            
-            # Phân bố điểm
-            for grade in grades:
-                category = categorize_grade(grade)
-                report[subject]['grade_distribution'][category] = \
-                    report[subject]['grade_distribution'].get(category, 0) + 1
-    
-    return report
-
-# Sử dụng
-student_data = {
-    'Toán': [8.5, 9.0, 7.5, 8.0, 9.5],
-    'Văn': [7.0, 8.0, 6.5, 7.5, 8.5],
-    'Anh': [9.0, 9.5, 8.5, 9.0, 9.5]
-}
-
-report = generate_grade_report(student_data)
-for subject, info in report.items():
-    print(f"\n{subject}:")
-    print(f"  Điểm trung bình: {info['statistics']['average']:.2f}")
-    print(f"  Phân loại: {info['category']}")
-    print(f"  Phân bố: {info['grade_distribution']}")
+# Chạy máy tính
+may_tinh()
 ```
 
-### 3. 🛒 Tình Huống: Hệ Thống E-commerce
+## 10. Tổng Kết
 
-```python
-def calculate_item_total(price, quantity, discount_percent=0):
-    """Tính tổng tiền cho một item"""
-    subtotal = price * quantity
-    discount_amount = subtotal * (discount_percent / 100)
-    return subtotal - discount_amount
+Functions là nền tảng quan trọng trong lập trình Python. Chúng giúp:
+- Tái sử dụng code hiệu quả
+- Tổ chức chương trình rõ ràng
+- Dễ bảo trì và phát triển
+- Chia nhỏ bài toán phức tạp
 
-def calculate_shipping_cost(total_amount, weight, shipping_method='standard'):
-    """Tính phí vận chuyển"""
-    if total_amount >= 100:  # Free shipping cho đơn hàng >= $100
-        return 0
-    
-    shipping_rates = {
-        'standard': 5.99,
-        'express': 12.99,
-        'overnight': 24.99
-    }
-    
-    base_cost = shipping_rates.get(shipping_method, 5.99)
-    
-    # Thêm phí theo trọng lượng
-    if weight > 5:  # kg
-        base_cost += (weight - 5) * 2
-    
-    return base_cost
+### Điểm Quan Trọng Cần Nhớ:
+1. **Đặt tên function rõ ràng** - Tên phải mô tả chức năng
+2. **Mỗi function làm một việc** - Nguyên tắc Single Responsibility
+3. **Sử dụng docstring** - Tài liệu hóa code
+4. **Xử lý lỗi** - Kiểm tra input và edge cases
+5. **Return có ý nghĩa** - Trả về giá trị phù hợp
 
-def apply_coupon(total_amount, coupon_code):
-    """Áp dụng mã giảm giá"""
-    coupons = {
-        'SAVE10': {'type': 'percent', 'value': 10, 'min_amount': 50},
-        'SAVE20': {'type': 'percent', 'value': 20, 'min_amount': 100},
-        'FLAT15': {'type': 'fixed', 'value': 15, 'min_amount': 75}
-    }
-    
-    if coupon_code not in coupons:
-        return 0, "Mã giảm giá không hợp lệ"
-    
-    coupon = coupons[coupon_code]
-    
-    if total_amount < coupon['min_amount']:
-        return 0, f"Đơn hàng tối thiểu ${coupon['min_amount']} để sử dụng mã này"
-    
-    if coupon['type'] == 'percent':
-        discount = total_amount * (coupon['value'] / 100)
-    else:  # fixed
-        discount = coupon['value']
-    
-    return discount, "Mã giảm giá đã được áp dụng"
-
-def calculate_order_total(items, shipping_method='standard', coupon_code=None):
-    """Tính tổng đơn hàng"""
-    subtotal = 0
-    total_weight = 0
-    
-    # Tính tổng từng item
-    for item in items:
-        item_total = calculate_item_total(
-            item['price'], 
-            item['quantity'], 
-            item.get('discount', 0)
-        )
-        subtotal += item_total
-        total_weight += item['weight'] * item['quantity']
-    
-    # Tính phí vận chuyển
-    shipping_cost = calculate_shipping_cost(subtotal, total_weight, shipping_method)
-    
-    # Tính tổng trước giảm giá
-    total_before_coupon = subtotal + shipping_cost
-    
-    # Áp dụng coupon
-    coupon_discount = 0
-    coupon_message = ""
-    if coupon_code:
-        coupon_discount, coupon_message = apply_coupon(total_before_coupon, coupon_code)
-    
-    # Tổng cuối cùng
-    final_total = total_before_coupon - coupon_discount
-    
-    return {
-        'subtotal': subtotal,
-        'shipping_cost': shipping_cost,
-        'coupon_discount': coupon_discount,
-        'coupon_message': coupon_message,
-        'final_total': final_total,
-        'total_weight': total_weight
-    }
-
-# Sử dụng
-order_items = [
-    {'name': 'Laptop', 'price': 999.99, 'quantity': 1, 'weight': 2.5, 'discount': 10},
-    {'name': 'Mouse', 'price': 29.99, 'quantity': 2, 'weight': 0.2, 'discount': 0},
-    {'name': 'Keyboard', 'price': 79.99, 'quantity': 1, 'weight': 1.0, 'discount': 5}
-]
-
-order_summary = calculate_order_total(
-    order_items, 
-    shipping_method='express', 
-    coupon_code='SAVE20'
-)
-
-print("=== HÓA ĐƠN ===")
-print(f"Tổng tiền hàng: ${order_summary['subtotal']:.2f}")
-print(f"Phí vận chuyển: ${order_summary['shipping_cost']:.2f}")
-print(f"Giảm giá: -${order_summary['coupon_discount']:.2f}")
-print(f"Tổng thanh toán: ${order_summary['final_total']:.2f}")
-print(f"Trọng lượng: {order_summary['total_weight']:.1f} kg")
-print(f"Coupon: {order_summary['coupon_message']}")
-```
-
----
-
-## 🎯 PHẦN VII: TESTING VÀ DEBUGGING
-
-### 1. 🧪 Testing Functions
-
-```python
-def test_calculate_average():
-    """Test function calculate_average"""
-    
-    # Test case 1: Normal case
-    assert calculate_average([1, 2, 3, 4, 5]) == 3.0
-    
-    # Test case 2: Single element
-    assert calculate_average([10]) == 10.0
-    
-    # Test case 3: Empty list
-    assert calculate_average([]) == 0
-    
-    # Test case 4: Negative numbers
-    assert calculate_average([-1, -2, -3]) == -2.0
-    
-    # Test case 5: Mixed numbers
-    assert calculate_average([-5, 0, 5]) == 0.0
-    
-    print("✅ Tất cả test cases đều pass!")
-
-# Chạy test
-test_calculate_average()
-```
-
-### 2. 🐛 Debugging Strategies
-
-```python
-def debug_function(data):
-    """Function với debugging statements"""
-    print(f"DEBUG: Input data = {data}")
-    print(f"DEBUG: Type of data = {type(data)}")
-    
-    if not data:
-        print("DEBUG: Data is empty")
-        return 0
-    
-    result = sum(data) / len(data)
-    print(f"DEBUG: Calculated result = {result}")
-    
-    return result
-
-# Sử dụng
-result = debug_function([1, 2, 3, 4, 5])
-print(f"Final result: {result}")
-```
-
----
-
-## 📝 PHẦN VIII: BÀI TẬP VÀ THỰC HÀNH
-
-### 🎯 Bài Tập Cơ Bản
-
-1. **Viết function tính diện tích hình chữ nhật**
-2. **Viết function kiểm tra số nguyên tố**
-3. **Viết function đảo ngược chuỗi**
-4. **Viết function tìm số lớn nhất trong list**
-5. **Viết function chuyển đổi nhiệt độ C sang F**
-
-### 🎯 Bài Tập Nâng Cao
-
-1. **Viết function tính factorial với recursion**
-2. **Viết function validate email address**
-3. **Viết function tính lương nhân viên phức tạp**
-4. **Viết function phân tích văn bản**
-5. **Viết function quản lý inventory**
-
----
-
-## 🎉 KẾT LUẬN
-
-Functions là nền tảng của lập trình Python. Thành thạo functions sẽ giúp bạn:
-
-- ✅ Viết code clean, maintainable
-- ✅ Tái sử dụng code hiệu quả
-- ✅ Debug và test dễ dàng
-- ✅ Xây dựng applications phức tạp
-- ✅ Làm việc nhóm hiệu quả
-
-**Bước tiếp theo**: Học về Parameters và Arguments chi tiết trong `2-parameters-arguments.md`
-
----
-
-*"Code is read more often than it is written. Make your functions readable." - Tanbaycu* 
+### Lộ Trình Học Tiếp:
+- **Tiếp theo**: Parameters & Arguments chi tiết
+- **Nâng cao**: Lambda functions, Decorators
+- **Thực hành**: Các dự án lớn sử dụng functions 
